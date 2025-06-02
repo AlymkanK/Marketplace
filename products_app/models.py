@@ -80,3 +80,76 @@ def clear_cache_final_price(sender, instance, **kwargs):
     cache_key = f'product_{instance.id}_final_price'
     cache.delete(cache_key)
 
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='product_images/')
+
+    def __str__(self):
+        return f'Изображение {self.product.name}'
+
+
+class Attribute(models.Model):
+    TEXT = 'text'
+    NUMBER = 'number'
+    CHOICE = 'choice'
+
+    TYPE_CHOICES = [
+        (TEXT, _('Текст')),
+        (NUMBER, _('Число')),
+        (CHOICE, _('Выбор')),
+    ]
+
+    name = models.CharField(max_length=255, verbose_name=_('Название атрибута'))
+    type_attribute = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TEXT, verbose_name=_('Тип аттрибута'))
+
+    def __str__(self):
+        return self.name
+
+
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
+    attribute = models.ForeignKey(Attribute, on_delete=models.CASCADE, related_name='product_attributes')
+    value = models.TextField(verbose_name='Значение аттрибута')
+
+    def __str__(self):
+        return f'{self.attribute.name}:  {self.value}'
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews_product')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews_user')
+    rating = models.PositiveIntegerField(verbose_name=_('Рейтинг товара'), null=True, blank=True, validators=[MinValueValidator(1)])
+    comment = models.TextField(verbose_name=_('Комментарий'), null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+    is_approved = models.BooleanField(default=False, verbose_name=_('Одобрен'))
+
+    def __str__(self) -> str:
+        return f'Отзыв от пользователя: {self.user.username} на продукт: {self.product.name}'
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_at']),
+            models.Index(fields=['updated_at']),
+        ]
+
+'''
+review = Review.objects.get(id=1)
+review_image = review.images.all()
+'''
+class ReviewImage(models.Model):
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='review_images/')
+
+    def __str__(self):
+        return f'Изображение к отзыву {self.review.id}'
+
+
+class Questions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_questions')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField(verbose_name='Вопрос')
+
+    def __str__(self):
+        return f'Вопрос от {self.user.username} к {self.product.name}: {self.text[:30]}'
+
