@@ -1,12 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers  import DefaultRouter
-from .views import CartViewSet
+from .views import CartViewSet, CartItemVIewSet
+
+app_name = 'cart_app'
 
 router = DefaultRouter()
 router.register('carts', CartViewSet, basename='cart')
 
-app_name = 'cart_app'
+
+
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls), name='cart')
 ]

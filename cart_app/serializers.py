@@ -1,9 +1,9 @@
 from .models import Cart, Favourites, CartItem
 from rest_framework import serializers
+from products_app.serializers import ProductsSerializer
 
-from ..products_app.serializers import ProductsSerializer
 
-class CartSerilizer(serializers.ModelSerializer):
+class CartSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     product = ProductsSerializer()
 

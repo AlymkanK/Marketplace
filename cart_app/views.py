@@ -2,13 +2,12 @@ from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .models import Cart, Favourites, CartItem
-from .serializers import CartSerilizer, FavouritesSerializer, CartItemSerializer, CartItemUpdateSerializer, \
-    UpdateCartItemSerializer, AddCartItemSerializer
+from .serializers import CartSerializer, FavouritesSerializer, CartItemSerializer, UpdateCartItemSerializer, AddCartItemSerializer
 
 
 class CartViewSet(ModelViewSet):
     queryset = Cart.objects.all()
-    serializer_class = CartSerilizer
+    serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
     def  create_cart(self, serializer):
